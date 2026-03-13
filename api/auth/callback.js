@@ -12,10 +12,8 @@ export default async function handler(req, res) {
   try {
     const clientId = process.env.GOOGLE_CLIENT_ID;
     const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
-    const host = req.headers.host || process.env.VERCEL_URL || 'aria-agent-iota.vercel.app';
-    const redirectUri = `https://${host}/api/auth/callback`;
+    const redirectUri = process.env.GOOGLE_REDIRECT_URI;
 
-    // Ã‰changer le code contre un token
     const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -34,17 +32,19 @@ export default async function handler(req, res) {
       return res.redirect('/?auth=error&message=' + encodeURIComponent(tokens.error_description || 'token_error'));
     }
 
-    // Stocker le token dans un cookie sÃ©curisÃ©
     const tokenData = encodeURIComponent(JSON.stringify({
       access_token: tokens.access_token,
-      refresh_token: tokens.refresh_token,
-      expiry: Date.now() + (tokens.expires_in * 1000)
+      refresh_token: tokens.refresh_token || null,
+      expiry: Date.now() + tokens.expires_in * 1000
     }));
 
     res.setHeader(
-  'Set-Cookie',
-  `google_token=${tokenData}; Path=/; Secure; HttpOnly; SameSite=None; Max-Age=2592000`
-);
+      'Set-Cookie',
+      `google_token=${tokenData}; Path=/; Secure; HttpOnly; SameSite=None; Max-Age=2592000`
+    );
+
+    return res.redirect('/?auth=success');
+
   } catch (err) {
     return res.redirect('/?auth=error&message=' + encodeURIComponent(err.message));
   }
