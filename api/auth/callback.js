@@ -41,9 +41,10 @@ export default async function handler(req, res) {
       expiry: Date.now() + (tokens.expires_in * 1000)
     }));
 
-    res.setHeader('Set-Cookie', `google_token=${tokenData}; Path=/; Secure; SameSite=None; Max-Age=2592000`);
-    return res.redirect('/?auth=success');
-
+    res.setHeader(
+  'Set-Cookie',
+  `google_token=${tokenData}; Path=/; Secure; HttpOnly; SameSite=None; Max-Age=2592000`
+);
   } catch (err) {
     return res.redirect('/?auth=error&message=' + encodeURIComponent(err.message));
   }
