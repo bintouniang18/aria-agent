@@ -40,7 +40,7 @@ export default async function handler(req, res) {
 
     res.setHeader(
       'Set-Cookie',
-      `google_token=${tokenData}; Path=/; Secure; HttpOnly; SameSite=None; Max-Age=2592000`
+      `google_token=${tokenData}; Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age=2592000`
     );
 
     return res.redirect('/?auth=success');
