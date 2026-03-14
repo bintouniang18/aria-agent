@@ -20,10 +20,11 @@ export default async function handler(req, res) {
     }
 
     // Récupérer les emails non lus
-    const listRes = await fetch(
-      'https://gmail.googleapis.com/gmail/v1/users/me/messages?q=is:unread&maxResults=6',
-      { headers: { Authorization: `Bearer ${accessToken}` } }
-    );
+    const listRes = await fetch("https://gmail.googleapis.com/gmail/v1/users/me/messages", {
+  headers: {
+    Authorization: `Bearer ${accessToken}`
+  }
+});
     const listData = await listRes.json();
 
     if (!listRes.ok) return res.status(listRes.status).json({ error: listData.error?.message });
