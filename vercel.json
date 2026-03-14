@@ -1,11 +1,7 @@
 {
   "version": 2,
   "routes": [
-    { "src": "/api/auth/login", "dest": "/api/auth/login.js" },
-    { "src": "/api/auth/callback", "dest": "/api/auth/callback.js" },
-    { "src": "/api/gmail", "dest": "/api/gmail.js" },
-    { "src": "/api/calendar", "dest": "/api/calendar.js" },
-    { "src": "/api/chat", "dest": "/api/chat.js" },
+    { "src": "/api/(.*)", "dest": "/api/$1.js" },
     { "src": "/(.*)", "dest": "/index.html" }
   ]
 }
