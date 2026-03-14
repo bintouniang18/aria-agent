@@ -446,26 +446,29 @@ function addTyping(){
 async function loadMail(){
   const c=document.getElementById('mail-list');
   const banner=document.getElementById('mail-banner');
-  c.innerHTML='<div style="color:var(--muted);font-size:12px;text-align:center;padding:16px">Chargement Gmail…</div>';
+  c.innerHTML='<div style="color:var(--muted);font-size:12px;text-align:center;padding:16px">Chargement…</div>';
   try {
-    const r=await fetch('/api/gmail');
-    if(r.status===401){banner.style.display='block';c.innerHTML='';return;}
-    banner.style.display='none';
+    const r=await fetch('/api/emails');
     const d=await r.json();
-    if(d.error){c.innerHTML=`<div style="color:var(--red);font-size:12px;padding:12px">Erreur : ${d.error}</div>`;return;}
     const emails=d.emails||[];
+    banner.style.display='none';
+    if(!emails.length){
+      c.innerHTML='<div style="color:var(--muted);font-size:12px;text-align:center;padding:16px">Aucun email reçu via Make pour l\'instant.</div>';
+      return;
+    }
     document.getElementById('k-mail').textContent=emails.length;
     document.getElementById('mail-badge').textContent=emails.length;
-    if(!emails.length){c.innerHTML='<div style="color:var(--muted);font-size:12px;text-align:center;padding:16px">Aucun email non lu</div>';return;}
     c.innerHTML=emails.map(e=>`<div class="row">
       <div class="unread-dot"></div>
-      <div class="av" style="background:${e.color}22;color:${e.color}">${e.initials}</div>
+      <div class="av" style="background:${e.color}22;color:${e.color}">${e.initials||'?'}</div>
       <div style="flex:1;min-width:0">
-        <div style="font-size:12px;font-weight:500">${e.from}</div>
-        <div style="font-size:10px;color:var(--muted)">${e.subject} · ${e.date}</div>
-        <div style="font-size:10px;color:var(--muted2);margin-top:2px">${e.summary}</div>
+        <div style="font-size:12px;font-weight:500">${e.from||'?'}</div>
+        <div style="font-size:10px;color:var(--muted)">${e.subject||''} · ${e.date||''}</div>
+        <div style="font-size:10px;color:var(--muted2);margin-top:2px">${e.snippet||''}</div>
       </div></div>`).join('');
-  } catch(e){c.innerHTML=`<div style="color:var(--red);font-size:12px;padding:12px">Erreur : ${e.message}</div>`;}
+  } catch(e){
+    c.innerHTML=`<div style="color:var(--red);font-size:12px;padding:12px">Erreur : ${e.message}</div>`;
+  }
 }
 
 async function loadCal(){
