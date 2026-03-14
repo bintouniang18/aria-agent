@@ -28,3 +28,8 @@ export default async function handler(req, res) {
   const data = await gmail.json();
   res.json(data);
 }
+if (!accessToken) {
+  return res.status(401).json({
+    error: "Google non connecté"
+  });
+}
