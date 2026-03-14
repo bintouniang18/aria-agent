@@ -16,14 +16,14 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: "Session expired" });
   }
 
-  const gmail = await fetch(
-    "https://gmail.googleapis.com/gmail/v1/users/me/messages",
-    {
-      headers: {
-        Authorization: `Bearer ${tokens.access_token}`
-      }
+  const res = await fetch(
+  "https://gmail.googleapis.com/gmail/v1/users/me/messages",
+  {
+    headers: {
+      Authorization: `Bearer ${accessToken}`
     }
-  );
+  }
+);
 
   const data = await gmail.json();
   res.json(data);
