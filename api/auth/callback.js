@@ -48,5 +48,6 @@ export default async function handler(req, res) {
   } catch (err) {
     return res.redirect('/?auth=error&message=' + encodeURIComponent(err.message));
     console.log(tokens)
+    Set-Cookie: google_token=...
   }
 }
