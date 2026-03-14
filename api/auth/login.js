@@ -1,7 +1,7 @@
 export default function handler(req, res) {
   const clientId = process.env.GOOGLE_CLIENT_ID;
   const host = req.headers.host || process.env.VERCEL_URL || 'aria-agent-iota.vercel.app';
-  const redirectUri = `https://${host}/api/auth/callback`;
+  const redirectUri = process.env.GOOGLE_REDIRECT_URI;
 
   const scopes = [
     'https://www.googleapis.com/auth/gmail.readonly',
