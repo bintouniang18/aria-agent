@@ -1,52 +1,29 @@
 export default async function handler(req, res) {
-  const { code, error } = req.query;
+  const { code } = req.query;
 
-  if (error) {
-    return res.redirect('/?auth=error&message=' + encodeURIComponent(error));
-  }
+  const tokenRes = await fetch("https://oauth2.googleapis.com/token", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      code,
+      client_id: process.env.GOOGLE_CLIENT_ID,
+      client_secret: process.env.GOOGLE_CLIENT_SECRET,
+      redirect_uri: process.env.GOOGLE_REDIRECT_URI,
+      grant_type: "authorization_code"
+    })
+  });
 
-  if (!code) {
-    return res.redirect('/?auth=error&message=no_code');
-  }
+  const tokens = await tokenRes.json();
 
-  try {
-    const clientId = process.env.GOOGLE_CLIENT_ID;
-    const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
-    const redirectUri = process.env.GOOGLE_REDIRECT_URI;
+  const sessionId = crypto.randomUUID();
 
-    const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({
-        code,
-        client_id: clientId,
-        client_secret: clientSecret,
-        redirect_uri: redirectUri,
-        grant_type: 'authorization_code'
-      })
-    });
+  global.sessions = global.sessions || {};
+  global.sessions[sessionId] = tokens;
 
-    const tokens = await tokenRes.json();
+  res.setHeader(
+    "Set-Cookie",
+    `session_id=${sessionId}; Path=/; HttpOnly; Secure; SameSite=Lax`
+  );
 
-    if (!tokenRes.ok) {
-      return res.redirect('/?auth=error&message=' + encodeURIComponent(tokens.error_description || 'token_error'));
-    }
-
-    const tokenData = encodeURIComponent(JSON.stringify({
-      access_token: tokens.access_token,
-      refresh_token: tokens.refresh_token || null,
-      expiry: Date.now() + tokens.expires_in * 1000
-    }));
-
-    res.setHeader(
-      'Set-Cookie',
-      `google_token=${tokenData}; Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age=2592000`
-    );
-
-    return res.redirect('/?auth=success');
-
-  } catch (err) {
-    return res.redirect('/?auth=error&message=' + encodeURIComponent(err.message));
-    
-  }
+  res.redirect("/");
 }
