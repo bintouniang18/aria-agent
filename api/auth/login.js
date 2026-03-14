@@ -1,6 +1,6 @@
 export default function handler(req, res) {
   const clientId = process.env.GOOGLE_CLIENT_ID;
-  const redirectUri = process.env.GOOGLE_REDIRECT_URI;
+  const redirectUri = process.env.GOOGLE_REDIRECT_URI
 
   if (!clientId || !redirectUri) {
     return res.status(500).send("OAuth config missing");
